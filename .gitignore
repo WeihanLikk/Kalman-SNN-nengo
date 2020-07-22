@@ -10,3 +10,5 @@
 /Y_1.jpg
 /.idea
 /__pycache__
+/dataloader.pyc
+/kalman.pyc
