@@ -42,7 +42,7 @@ class Kalman(object):
         #     trainY_new = np.mat(trainY[1, :])
         #
         A, y, e = self.least_squre(trainY_new[:, 0:-1], trainY_new[:, 1:], 0.1)
-        W = np.dot(e, np.transpose(e)) / T
+        W = np.dot(e, np.transpose(e)) / (T - 1)
 
         C, y, e = self.least_squre(trainY_new, trainX, 0.1)
         Q = np.dot(e, np.transpose(e)) / T

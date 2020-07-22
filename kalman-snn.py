@@ -89,7 +89,7 @@ with model:
 
     conn3 = nengo.Connection(LIF_Neurons, LIF_Neurons[0:2],
                              function=update,
-                             synapse=tau
+                             synapse=0.005
                              )
 
     neurons_out = nengo.Probe(LIF_Neurons)

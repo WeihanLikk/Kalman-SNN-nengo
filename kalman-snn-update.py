@@ -10,7 +10,7 @@ from nengo.processes import Piecewise
 dt = 0.1  # simulation time step
 t_rc = 0.04  # membrane RC time constant
 t_ref = 0.002  # refractory period
-tau = 0.05  # synapse time constant for standard first-order lowpass filter synapse
+tau = 0.2  # synapse time constant for standard first-order lowpass filter synapse
 N_A = 1000  # number of neurons in first population
 rate_A = 200, 400  # range of maximum firing rates for population A
 pool = 0
@@ -110,7 +110,7 @@ with model:
 
     conn3 = nengo.Connection(LIF_Neurons, LIF_Neurons[0:2],
                              function=update,
-                             synapse=tau
+                             synapse=0.005
                              )
 
     neurons_out = nengo.Probe(LIF_Neurons)
