@@ -7,10 +7,10 @@ from dataloader import Dataloader
 from kalman import Kalman
 from nengo.processes import Piecewise
 
-dt = 0.1  # simulation time step
-t_rc = 0.04  # membrane RC time constant
-t_ref = 0.002  # refractory period
-tau = 0.2  # synapse time constant for standard first-order lowpass filter synapse
+dt = 0.02  # simulation time step
+t_rc = 0.01  # membrane RC time constant
+t_ref = 0.001  # refractory period
+tau = 0.009  # synapse time constant for standard first-order lowpass filter synapse
 N_A = 1000  # number of neurons in first population
 rate_A = 200, 400  # range of maximum firing rates for population A
 pool = 0
@@ -110,23 +110,23 @@ with model:
 
     conn3 = nengo.Connection(LIF_Neurons, LIF_Neurons[0:2],
                              function=update,
-                             synapse=0.005
+                             synapse=tau
                              )
 
     neurons_out = nengo.Probe(LIF_Neurons)
 
     with nengo.Simulator(model, dt=dt) as sim:
-        for i in range(2999):
+        for i in range(18000):
             sim.step()
             if i != 0:
                 A_0, B_0 = kalman.K_update(dt, tau)
         # sim.run(299)
 
-    print(np.corrcoef(sim.data[neurons_out][:, 0], sim.data[origin_probe][:, 0]))
-    print(np.square(sim.data[neurons_out][:, 0] - sim.data[origin_probe][:, 0]).mean())
+    print(np.corrcoef(sim.data[neurons_out][:, 0], testY[0, 1:18001]))
+    print(np.square(sim.data[neurons_out][:, 0] - testY[0, 1:18001]).mean())
 
-    print(np.corrcoef(sim.data[neurons_out][:, 1], sim.data[origin_probe][:, 1]))
-    print(np.square(sim.data[neurons_out][:, 1] - sim.data[origin_probe][:, 1]).mean())
+    print(np.corrcoef(sim.data[neurons_out][:, 1], testY[1, 1:18001]))
+    print(np.square(sim.data[neurons_out][:, 1] - testY[1, 1:18001]).mean())
 
     plt.figure()
     # plt.plot(sim.trange(), sim.data[neurons_probe], label="rates")

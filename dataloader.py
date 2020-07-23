@@ -5,11 +5,26 @@ import numpy as np
 class Dataloader(object):
 
     def __init__(self):
-        train_kin_data = scio.loadmat('./train/KinData1.mat')['KinData']
-        train_neural_data = scio.loadmat('./train/NeuralData1.mat')['NeuralData']
+        train_kin_data = scio.loadmat('./data/2019-11-11-S2.mat')['train_Y']
+        train_neural_data = scio.loadmat('./data/2019-11-11-S2.mat')['train_X']
 
-        test_kin_data = scio.loadmat('./test/KinData1.mat')['KinData']
-        test_neural_data = scio.loadmat('./test/NeuralData1.mat')['NeuralData']
+        # test_kin_data = scio.loadmat('./data/2019-11-11-S2.mat')['train_Y']
+        # test_neural_data = scio.loadmat('./data/2019-11-11-S2.mat')['train_X']
+        #
+        # train_kin_data = train_kin_data[:, 0:2500]
+        # train_neural_data = train_neural_data[:, 0:2500]
+        #
+        # test_kin_data = test_kin_data[:, 2500:3925]
+        # test_neural_data = test_neural_data[:, 2500:3925]
+
+        test_kin_data = scio.loadmat('./data/2019-11-11-S2.mat')['test_Y']
+        test_neural_data = scio.loadmat('./data/2019-11-11-S2.mat')['test_X']
+
+        # train_kin_data = scio.loadmat('./train/KinData1.mat')['KinData']
+        # train_neural_data = scio.loadmat('./train/NeuralData1.mat')['NeuralData']
+        #
+        # test_kin_data = scio.loadmat('./test/KinData1.mat')['KinData']
+        # test_neural_data = scio.loadmat('./test/NeuralData1.mat')['NeuralData']
 
         # 9799
         # train_kin_data = scio.loadmat('./ob_avoid_succ/2014031201.mat')['KinData']
