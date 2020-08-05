@@ -31,6 +31,9 @@ A_0, B_0 = kalman.calculate(trainX, trainY, pool=pool, dt=dt, tau=tau)
 
 # kalman.standard_Kalman_Filter(testX, testY)
 
+
+#
+
 def data(t):
     """
     Neuron records, Y_k, and calculate B * Y_k
@@ -60,9 +63,15 @@ def update(x):
 
 
 with model:
+    Dir_Nurons = nengo.Ensemble(
+        1,
+        dimensions=2 + 2,
+        neuron_type=nengo.Direct()
+    )
+
     LIF_Neurons = nengo.Ensemble(
         N_A,
-        dimensions=2 + 2,
+        dimensions=2,
         intercepts=Uniform(-1, 1),
         max_rates=Uniform(rate_A[0], rate_A[1]),
         neuron_type=lifRate_neuron
@@ -83,29 +92,36 @@ with model:
     external_input = nengo.Node(output=lambda t: data(t))
     external_input_probe = nengo.Probe(external_input)
 
-    conn0 = nengo.Connection(state, LIF_Neurons[0:2])
+    # conn0 = nengo.Connection(state, Dir_Nurons)
 
-    conn1 = nengo.Connection(external_input, LIF_Neurons[2:4])
+    conn0 = nengo.Connection(state, Dir_Nurons[0:2])
+    #
+    conn1 = nengo.Connection(external_input, Dir_Nurons[2:4])
 
-    conn3 = nengo.Connection(LIF_Neurons, LIF_Neurons[0:2],
-                             function=update,
-                             synapse=tau
-                             )
+    conn2 = nengo.Connection(Dir_Nurons, LIF_Neurons[0:2], function=update, synapse=tau)
 
-    neurons_out = nengo.Probe(LIF_Neurons)
+    conn3 = nengo.Connection(LIF_Neurons[0:2], Dir_Nurons[0:2])
+    #
+    # conn3 = nengo.Connection(LIF_Neurons, LIF_Neurons[0:2],
+    #                          function=update,
+    #                          synapse=tau
+    #                          )
+
+    neurons_out = nengo.Probe(LIF_Neurons[0:2])
 
     with nengo.Simulator(model, dt=dt) as sim:
-        for i in range(18000):
-            sim.step()
-        # sim.run(360)
+        # for i in range(18000):
+        #     sim.step()
+        sim.run(360)
     # sim = nengo.Simulator(model, dt=dt)
     # sim.run(299)
 
     print(np.corrcoef(sim.data[neurons_out][:, 0], testY[0, 1:18001]))
-    print(np.square(sim.data[neurons_out][:, 0] - testY[0, 1:18001]).mean())
+    # print(np.mean(np.square(sim.data[neurons_out][:, 0] - testY[0, 1:18001])))
+    print(np.sqrt(np.mean(np.square(sim.data[neurons_out][:, 0] - testY[0, 1:18001]))))
 
     print(np.corrcoef(sim.data[neurons_out][:, 1], testY[1, 1:18001]))
-    print(np.square(sim.data[neurons_out][:, 1] - testY[1, 1:18001]).mean())
+    print(np.sqrt(np.mean(np.square(sim.data[neurons_out][:, 1] - testY[1, 1:18001]))))
 
     plt.figure()
     # plt.plot(sim.trange(), sim.data[neurons_probe], label="rates")
@@ -113,8 +129,8 @@ with model:
 
     # plt.plot(sim.trange(), sim.data[neurons_out][:, 1], label="Control signal")
     # plt.plot(sim.trange(), sim.data[external_input_probe][:, 0], label="external_input probe")
-    plt.plot(sim.trange(), sim.data[origin_probe][:, 0], label="Origin X", linewidth=0.5)
     plt.plot(sim.trange(), sim.data[neurons_out][:, 0], label="Decoded estimate", linewidth=0.5)
+    plt.plot(sim.trange(), sim.data[origin_probe][:, 0], label="Origin X", linewidth=0.5)
     # plt.plot(sim.trange(), sim.data[input_probe], label="input")
     plt.legend()
     plt.show()

@@ -56,9 +56,10 @@ class Kalman(object):
         self.C_ = C
         self.W_ = W
         self.Q_ = Q
+
         self.P_ = np.mat(trainY_new) * np.mat(trainY_new).T / T
 
-        K = np.linalg.inv(np.eye(dim, dim) + W * C.T * Q.I * C) * W * C.T * Q.I
+        K = np.linalg.pinv(np.eye(dim, dim) + W * C.T * Q.I * C) * W * C.T * Q.I
 
         self.M_DT_x = (np.eye(dim, dim) - K * C) * A
         self.M_DT_y = K
@@ -78,7 +79,7 @@ class Kalman(object):
         R = np.dot(x, x.T) / T
         P = np.dot(x, d.T) / T
         C, D = np.shape(R)
-        W = np.dot(np.linalg.inv(R + alpha * np.eye(C, D)), P)
+        W = np.dot(np.linalg.pinv(R + alpha * np.eye(C, D)), P)
         W = np.transpose(W)
         y = np.dot(W, x)
         e = d - y
@@ -116,15 +117,17 @@ class Kalman(object):
 
         cc_x = np.corrcoef(pre[0, :], testY[0, :])
         cc_y = np.corrcoef(pre[1, :], testY[1, :])
-        mse_x = np.square(pre[0, :] - testY[0, :]).mean()
-        mse_y = np.square(pre[1, :] - testY[1, :]).mean()
+        rmse_x = np.sqrt(np.mean((pre[0, :] - testY[0, :]) ** 2))
+        rmse_y = np.sqrt(np.mean((pre[1, :] - testY[1, :]) ** 2))
+        # rmse_x = np.square(pre[0, :] - testY[0, :])
+        # rmse_y = np.square(pre[1, :] - testY[1, :]).mean()
 
         print(cc_x)
         print(cc_y)
         # 85%, 67%
 
-        print(mse_x)
-        print(mse_y)
+        print(rmse_x)
+        print(rmse_y)
 
         x = range(3000)
         plt.plot(x, pre[0, :], label='prediction')
@@ -146,7 +149,7 @@ class Kalman(object):
         initial = np.mat(testY[:, 0]).T
         pre.append(np.squeeze(np.asarray(initial)))
 
-        for i in range(2999):
+        for i in range(18000):
             pre_state = self.A_ * initial
             Pa = self.A_ * self.P_ * self.A_.T + self.W_
             S = self.C_ * Pa * self.C_.T + self.Q_
@@ -160,21 +163,24 @@ class Kalman(object):
             pre.append(np.squeeze(np.asarray(initial)))
 
         pre = np.transpose(pre)
-        cc_x = np.corrcoef(pre[0, :], testY[0, :])
-        cc_y = np.corrcoef(pre[1, :], testY[1, :])
-        mse_x = np.square(pre[0, :] - testY[0, :]).mean()
-        mse_y = np.square(pre[1, :] - testY[1, :]).mean()
+        cc_x = np.corrcoef(pre[0, :], testY[0, 0:18001])
+        cc_y = np.corrcoef(pre[1, :], testY[1, 0:18001])
+        # mse_x = np.square(pre[0, :] - testY[0, 0:18001]).mean()
+        # mse_y = np.square(pre[1, :] - testY[1, 0:18001]).mean()
+
+        rmse_x = np.sqrt(np.mean((pre[0, :] - testY[0, 0:18001]) ** 2))
+        rmse_y = np.sqrt(np.mean((pre[1, :] - testY[1, 0:18001]) ** 2))
 
         print(cc_x)
         print(cc_y)
         # 85%, 67%
 
-        print(mse_x)
-        print(mse_y)
+        print(rmse_x)
+        print(rmse_y)
 
-        x = range(3000)
+        x = range(18001)
         plt.plot(x, pre[0, :], label='prediction')
-        plt.plot(x, testY[0, :], label='origin')
+        plt.plot(x, testY[0, 0:18001], label='origin')
         plt.legend()
         plt.show()
 

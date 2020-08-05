@@ -20,6 +20,8 @@ class Dataloader(object):
         test_kin_data = scio.loadmat('./data/2019-11-11-S2.mat')['test_Y']
         test_neural_data = scio.loadmat('./data/2019-11-11-S2.mat')['test_X']
 
+        # train_kin_data = train_kin_data[0:2, :]
+        # test_kin_data = test_kin_data[0:2, :]
         # train_kin_data = scio.loadmat('./train/KinData1.mat')['KinData']
         # train_neural_data = scio.loadmat('./train/NeuralData1.mat')['NeuralData']
         #
