@@ -136,7 +136,7 @@ class Kalman(object):
         plt.legend()
         plt.show()
 
-    def standard_Kalman_Filter(self, testX, testY):
+    def standard_Kalman_Filter(self, testX, testY, length=18000):
 
         """
         Kalman Filter with dynamic change on Kalman Gain
@@ -146,10 +146,11 @@ class Kalman(object):
         """
 
         pre = []
-        initial = np.mat(testY[:, 0]).T
-        pre.append(np.squeeze(np.asarray(initial)))
-
-        for i in range(18000):
+        # initial = np.mat(testY[:, 0]).T
+        initial = np.mat([0, 0]).T
+        # pre.append(np.squeeze(np.asarray(initial)))
+        print(testY)
+        for i in range(length - 1):
             pre_state = self.A_ * initial
             Pa = self.A_ * self.P_ * self.A_.T + self.W_
             S = self.C_ * Pa * self.C_.T + self.Q_
@@ -163,13 +164,13 @@ class Kalman(object):
             pre.append(np.squeeze(np.asarray(initial)))
 
         pre = np.transpose(pre)
-        cc_x = np.corrcoef(pre[0, :], testY[0, 0:18001])
-        cc_y = np.corrcoef(pre[1, :], testY[1, 0:18001])
+        cc_x = np.corrcoef(pre[0, :], testY[0, 1:length])
+        cc_y = np.corrcoef(pre[1, :], testY[1, 1:length])
         # mse_x = np.square(pre[0, :] - testY[0, 0:18001]).mean()
         # mse_y = np.square(pre[1, :] - testY[1, 0:18001]).mean()
 
-        rmse_x = np.sqrt(np.mean((pre[0, :] - testY[0, 0:18001]) ** 2))
-        rmse_y = np.sqrt(np.mean((pre[1, :] - testY[1, 0:18001]) ** 2))
+        rmse_x = np.sqrt(np.mean((pre[0, :] - testY[0, 1:length]) ** 2))
+        rmse_y = np.sqrt(np.mean((pre[1, :] - testY[1, 1:length]) ** 2))
 
         print(cc_x)
         print(cc_y)
@@ -178,9 +179,11 @@ class Kalman(object):
         print(rmse_x)
         print(rmse_y)
 
-        x = range(18001)
-        plt.plot(x, pre[0, :], label='prediction')
-        plt.plot(x, testY[0, 0:18001], label='origin')
+        x = range(length - 1)
+        ax = plt.gca()
+        ax.set_ylim([-1, 1])
+        plt.plot(x, pre[0, :], label='prediction', linewidth=0.5)
+        plt.plot(x, testY[0, 1:length], label='origin', linewidth=0.5)
         plt.legend()
         plt.show()
 
@@ -209,3 +212,19 @@ class Kalman(object):
         B_ = tau * self.M_CT_y
 
         return A_, B_
+
+    def save(self, path=None):
+        data = [self.A_, self.C_, self.W_, self.Q_, self.P_]
+        np.save(path, data)
+
+    def load(self, path=None):
+        data = np.load(path, allow_pickle=True)
+        self.A_ = data[0]
+        self.C_ = data[1]
+        self.W_ = data[2]
+        self.Q_ = data[3]
+        self.P_ = data[4]
+
+    def getParam(self):
+        data = [self.A_, self.C_, self.W_, self.Q_, self.P_]
+        return data

@@ -1,3 +1,4 @@
+import array
 import numpy as np
 import nengo
 from nengo.dists import Uniform
@@ -112,8 +113,26 @@ class Kalman_SNN:
 
     def test(self, testX):
         self.A_k, self.B_k = self.kalman.K_update(dt=self.dt, tau=self.tau)
+
+        testX = np.asarray(testX)
         self.testX = testX[self.chN]
         self.sim.step()
         res = self.sim.data[self.output][self.count]
         self.count = self.count + 1
+
+        res = array.array('d', res)
         return res
+
+    def save(self, name='data.npy'):
+        path = './' + name
+        self.kalman.save(path)
+
+    def load(self, name='data.npy'):
+        path = './' + name
+        self.kalman.load(path)
+
+    def getParam(self):
+        return self.kalman.getParam()
+
+    def standard_kalman(self, testX, testY, length=None):
+        self.kalman.standard_Kalman_Filter(testX, testY, length)

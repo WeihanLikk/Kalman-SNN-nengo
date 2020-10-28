@@ -24,7 +24,6 @@ testX = np.squeeze(testX[ChN, :])
 
 A_0, B_0 = kalman.calculate(trainX, trainY, pool=pool, dt=dt, tau=tau)
 
-
 # A_1, B_1 = kalman.calculate(trainX, trainY, pool=1, dt=dt, tau=tau)
 
 # kalman.Kalman_Filter(testX, testY)

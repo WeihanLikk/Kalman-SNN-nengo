@@ -27,7 +27,7 @@ kalman.calculate(trainX, trainY, pool=pool, dt=dt, tau=tau)
 
 # kalman.Kalman_Filter(testX, testY)
 
-# kalman.standard_Kalman_Filter(testX, testY)
+kalman.standard_Kalman_Filter(testX, testY)
 
 
 global A_0, B_0

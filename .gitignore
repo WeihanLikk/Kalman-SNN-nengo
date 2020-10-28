@@ -13,3 +13,5 @@
 /dataloader.pyc
 /kalman.pyc
 /data
+/data.npy
+/temp
